@@ -22,6 +22,12 @@ export default class EmployeeUpdatePage extends AlertPage {
 
   commissionPctInput: ElementFinder = element(by.css('input#employee-commissionPct'));
 
+  levelInput: ElementFinder = element(by.css('input#employee-level'));
+
+  contractSelect = element(by.css('select#employee-contract'));
+
+  cvInput: ElementFinder = element(by.css('input#file_cv'));
+
   managerSelect = element(by.css('select#employee-manager'));
 
   departmentSelect = element(by.css('select#employee-department'));

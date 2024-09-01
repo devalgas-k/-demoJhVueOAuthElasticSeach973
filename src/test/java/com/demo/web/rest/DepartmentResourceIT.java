@@ -12,12 +12,13 @@ import com.demo.IntegrationTest;
 import com.demo.domain.Department;
 import com.demo.repository.DepartmentRepository;
 import com.demo.repository.search.DepartmentSearchRepository;
+import com.demo.service.dto.DepartmentDTO;
+import com.demo.service.mapper.DepartmentMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import org.apache.commons.collections4.IterableUtils;
 import org.assertj.core.util.IterableUtil;
@@ -26,6 +27,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -51,6 +55,9 @@ class DepartmentResourceIT {
 
     @Autowired
     private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private DepartmentMapper departmentMapper;
 
     @Autowired
     private DepartmentSearchRepository departmentSearchRepository;
@@ -102,12 +109,13 @@ class DepartmentResourceIT {
         int databaseSizeBeforeCreate = departmentRepository.findAll().size();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
         // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
         restDepartmentMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isCreated());
 
@@ -129,6 +137,7 @@ class DepartmentResourceIT {
     void createDepartmentWithExistingId() throws Exception {
         // Create the Department with an existing ID
         department.setId(1L);
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
 
         int databaseSizeBeforeCreate = departmentRepository.findAll().size();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
@@ -139,7 +148,7 @@ class DepartmentResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -159,13 +168,14 @@ class DepartmentResourceIT {
         department.setDepartmentName(null);
 
         // Create the Department, which fails.
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
 
         restDepartmentMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -227,13 +237,14 @@ class DepartmentResourceIT {
         // Disconnect from session so that the updates on updatedDepartment are not directly saved in db
         em.detach(updatedDepartment);
         updatedDepartment.departmentName(UPDATED_DEPARTMENT_NAME);
+        DepartmentDTO departmentDTO = departmentMapper.toDto(updatedDepartment);
 
         restDepartmentMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedDepartment.getId())
+                put(ENTITY_API_URL_ID, departmentDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedDepartment))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isOk());
 
@@ -260,13 +271,16 @@ class DepartmentResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
         department.setId(count.incrementAndGet());
 
+        // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, department.getId())
+                put(ENTITY_API_URL_ID, departmentDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -284,13 +298,16 @@ class DepartmentResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
         department.setId(count.incrementAndGet());
 
+        // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -308,13 +325,16 @@ class DepartmentResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
         department.setId(count.incrementAndGet());
 
+        // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -390,13 +410,16 @@ class DepartmentResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
         department.setId(count.incrementAndGet());
 
+        // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, department.getId())
+                patch(ENTITY_API_URL_ID, departmentDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -414,13 +437,16 @@ class DepartmentResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
         department.setId(count.incrementAndGet());
 
+        // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -438,13 +464,16 @@ class DepartmentResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(departmentSearchRepository.findAll());
         department.setId(count.incrementAndGet());
 
+        // Create the Department
+        DepartmentDTO departmentDTO = departmentMapper.toDto(department);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restDepartmentMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(department))
+                    .content(TestUtil.convertObjectToJsonBytes(departmentDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 

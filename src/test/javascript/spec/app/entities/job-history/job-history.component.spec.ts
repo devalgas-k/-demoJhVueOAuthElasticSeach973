@@ -80,6 +80,18 @@ describe('Component Tests', () => {
       expect(comp.jobHistories[0]).toEqual(expect.objectContaining({ id: 123 }));
     });
 
+    it('should not load a page if the page is the same as the previous page', () => {
+      // GIVEN
+      jobHistoryServiceStub.retrieve.reset();
+      comp.previousPage = 1;
+
+      // WHEN
+      comp.loadPage(1);
+
+      // THEN
+      expect(jobHistoryServiceStub.retrieve.called).toBeFalsy();
+    });
+
     it('should re-initialize the page', async () => {
       // GIVEN
       jobHistoryServiceStub.retrieve.reset();
@@ -92,7 +104,7 @@ describe('Component Tests', () => {
       await comp.$nextTick();
 
       // THEN
-      expect(jobHistoryServiceStub.retrieve.callCount).toEqual(2);
+      expect(jobHistoryServiceStub.retrieve.callCount).toEqual(3);
       expect(comp.page).toEqual(1);
       expect(comp.jobHistories[0]).toEqual(expect.objectContaining({ id: 123 }));
     });

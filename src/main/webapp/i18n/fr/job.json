@@ -22,6 +22,11 @@
       "jobTitle": "Job Title",
       "minSalary": "Min Salary",
       "maxSalary": "Max Salary",
+      "subSalary": "Sub Salary",
+      "totalSalary": "Total Salary",
+      "date": "Date",
+      "codeCode": "Code Code",
+      "profil": "Profil",
       "task": "Task",
       "employee": "Employee"
     }

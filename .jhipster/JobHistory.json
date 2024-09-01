@@ -1,7 +1,7 @@
 {
   "applications": "*",
   "changelogDate": "20240901000713",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "job_history",
   "fields": [
@@ -17,12 +17,25 @@
       "fieldName": "language",
       "fieldType": "Language",
       "fieldValues": "FRENCH,ENGLISH,SPANISH"
+    },
+    {
+      "fieldName": "file",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "ZonedDateTime"
+    },
+    {
+      "fieldName": "duration",
+      "fieldType": "Duration"
     }
   ],
   "fluentMethods": true,
   "jpaMetamodelFiltering": false,
   "name": "JobHistory",
-  "pagination": "infinite-scroll",
+  "pagination": "pagination",
   "readOnly": false,
   "relationships": [
     {

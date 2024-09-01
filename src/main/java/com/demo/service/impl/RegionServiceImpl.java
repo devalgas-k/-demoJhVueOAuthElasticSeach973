@@ -6,12 +6,13 @@ import com.demo.domain.Region;
 import com.demo.repository.RegionRepository;
 import com.demo.repository.search.RegionSearchRepository;
 import com.demo.service.RegionService;
-import java.util.List;
+import com.demo.service.dto.RegionDTO;
+import com.demo.service.mapper.RegionMapper;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,39 +27,44 @@ public class RegionServiceImpl implements RegionService {
 
     private final RegionRepository regionRepository;
 
+    private final RegionMapper regionMapper;
+
     private final RegionSearchRepository regionSearchRepository;
 
-    public RegionServiceImpl(RegionRepository regionRepository, RegionSearchRepository regionSearchRepository) {
+    public RegionServiceImpl(RegionRepository regionRepository, RegionMapper regionMapper, RegionSearchRepository regionSearchRepository) {
         this.regionRepository = regionRepository;
+        this.regionMapper = regionMapper;
         this.regionSearchRepository = regionSearchRepository;
     }
 
     @Override
-    public Region save(Region region) {
-        log.debug("Request to save Region : {}", region);
-        Region result = regionRepository.save(region);
-        regionSearchRepository.index(result);
+    public RegionDTO save(RegionDTO regionDTO) {
+        log.debug("Request to save Region : {}", regionDTO);
+        Region region = regionMapper.toEntity(regionDTO);
+        region = regionRepository.save(region);
+        RegionDTO result = regionMapper.toDto(region);
+        regionSearchRepository.index(region);
         return result;
     }
 
     @Override
-    public Region update(Region region) {
-        log.debug("Request to update Region : {}", region);
-        Region result = regionRepository.save(region);
-        regionSearchRepository.index(result);
+    public RegionDTO update(RegionDTO regionDTO) {
+        log.debug("Request to update Region : {}", regionDTO);
+        Region region = regionMapper.toEntity(regionDTO);
+        region = regionRepository.save(region);
+        RegionDTO result = regionMapper.toDto(region);
+        regionSearchRepository.index(region);
         return result;
     }
 
     @Override
-    public Optional<Region> partialUpdate(Region region) {
-        log.debug("Request to partially update Region : {}", region);
+    public Optional<RegionDTO> partialUpdate(RegionDTO regionDTO) {
+        log.debug("Request to partially update Region : {}", regionDTO);
 
         return regionRepository
-            .findById(region.getId())
+            .findById(regionDTO.getId())
             .map(existingRegion -> {
-                if (region.getRegionName() != null) {
-                    existingRegion.setRegionName(region.getRegionName());
-                }
+                regionMapper.partialUpdate(existingRegion, regionDTO);
 
                 return existingRegion;
             })
@@ -67,21 +73,22 @@ public class RegionServiceImpl implements RegionService {
                 regionSearchRepository.save(savedRegion);
 
                 return savedRegion;
-            });
+            })
+            .map(regionMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Region> findAll() {
+    public Page<RegionDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Regions");
-        return regionRepository.findAll();
+        return regionRepository.findAll(pageable).map(regionMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Region> findOne(Long id) {
+    public Optional<RegionDTO> findOne(Long id) {
         log.debug("Request to get Region : {}", id);
-        return regionRepository.findById(id);
+        return regionRepository.findById(id).map(regionMapper::toDto);
     }
 
     @Override
@@ -93,8 +100,8 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Region> search(String query) {
-        log.debug("Request to search Regions for query {}", query);
-        return StreamSupport.stream(regionSearchRepository.search(query).spliterator(), false).collect(Collectors.toList());
+    public Page<RegionDTO> search(String query, Pageable pageable) {
+        log.debug("Request to search for a page of Regions for query {}", query);
+        return regionSearchRepository.search(query, pageable).map(regionMapper::toDto);
     }
 }

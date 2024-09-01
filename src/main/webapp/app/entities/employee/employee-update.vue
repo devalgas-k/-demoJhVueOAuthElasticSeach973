@@ -54,7 +54,20 @@
               data-cy="email"
               :class="{ valid: !$v.employee.email.$invalid, invalid: $v.employee.email.$invalid }"
               v-model="$v.employee.email.$model"
+              required
             />
+            <div v-if="$v.employee.email.$anyDirty && $v.employee.email.$invalid">
+              <small class="form-text text-danger" v-if="!$v.employee.email.required" v-text="$t('entity.validation.required')">
+                This field is required.
+              </small>
+              <small
+                class="form-text text-danger"
+                v-if="!$v.employee.email.pattern"
+                v-text="$t('entity.validation.pattern', { pattern: 'Email' })"
+              >
+                This field should follow pattern for "Email".
+              </small>
+            </div>
           </div>
           <div class="form-group">
             <label
@@ -120,6 +133,91 @@
               :class="{ valid: !$v.employee.commissionPct.$invalid, invalid: $v.employee.commissionPct.$invalid }"
               v-model.number="$v.employee.commissionPct.$model"
             />
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" v-text="$t('demoJhVueOAuthElasticSearch973App.employee.level')" for="employee-level"
+              >Level</label
+            >
+            <input
+              type="number"
+              class="form-control"
+              name="level"
+              id="employee-level"
+              data-cy="level"
+              :class="{ valid: !$v.employee.level.$invalid, invalid: $v.employee.level.$invalid }"
+              v-model.number="$v.employee.level.$model"
+            />
+            <div v-if="$v.employee.level.$anyDirty && $v.employee.level.$invalid">
+              <small class="form-text text-danger" v-if="!$v.employee.level.min" v-text="$t('entity.validation.min', { min: 1 })">
+                This field should be at least 1.
+              </small>
+              <small class="form-text text-danger" v-if="!$v.employee.level.max" v-text="$t('entity.validation.max', { max: 14 })">
+                This field cannot be longer than 14 characters.
+              </small>
+              <small class="form-text text-danger" v-if="!$v.employee.level.numeric" v-text="$t('entity.validation.number')">
+                This field should be a number.
+              </small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" v-text="$t('demoJhVueOAuthElasticSearch973App.employee.contract')" for="employee-contract"
+              >Contract</label
+            >
+            <select
+              class="form-control"
+              name="contract"
+              :class="{ valid: !$v.employee.contract.$invalid, invalid: $v.employee.contract.$invalid }"
+              v-model="$v.employee.contract.$model"
+              id="employee-contract"
+              data-cy="contract"
+            >
+              <option
+                v-for="contract in contractValues"
+                :key="contract"
+                v-bind:value="contract"
+                v-bind:label="$t('demoJhVueOAuthElasticSearch973App.Contract.' + contract)"
+              >
+                {{ contract }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-control-label" v-text="$t('demoJhVueOAuthElasticSearch973App.employee.cv')" for="employee-cv">Cv</label>
+            <div>
+              <div v-if="employee.cv" class="form-text text-danger clearfix">
+                <a class="pull-left" v-on:click="openFile(employee.cvContentType, employee.cv)" v-text="$t('entity.action.open')">open</a
+                ><br />
+                <span class="pull-left">{{ employee.cvContentType }}, {{ byteSize(employee.cv) }}</span>
+                <button
+                  type="button"
+                  v-on:click="
+                    employee.cv = null;
+                    employee.cvContentType = null;
+                  "
+                  class="btn btn-secondary btn-xs pull-right"
+                >
+                  <font-awesome-icon icon="times"></font-awesome-icon>
+                </button>
+              </div>
+              <input
+                type="file"
+                ref="file_cv"
+                id="file_cv"
+                data-cy="cv"
+                v-on:change="setFileData($event, employee, 'cv', false)"
+                v-text="$t('entity.action.addblob')"
+              />
+            </div>
+            <input
+              type="hidden"
+              class="form-control"
+              name="cv"
+              id="employee-cv"
+              data-cy="cv"
+              :class="{ valid: !$v.employee.cv.$invalid, invalid: $v.employee.cv.$invalid }"
+              v-model="$v.employee.cv.$model"
+            />
+            <input type="hidden" class="form-control" name="cvContentType" id="employee-cvContentType" v-model="employee.cvContentType" />
           </div>
           <div class="form-group">
             <label class="form-control-label" v-text="$t('demoJhVueOAuthElasticSearch973App.employee.manager')" for="employee-manager"

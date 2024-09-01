@@ -27,6 +27,15 @@
               :class="{ valid: !$v.region.regionName.$invalid, invalid: $v.region.regionName.$invalid }"
               v-model="$v.region.regionName.$model"
             />
+            <div v-if="$v.region.regionName.$anyDirty && $v.region.regionName.$invalid">
+              <small
+                class="form-text text-danger"
+                v-if="!$v.region.regionName.pattern"
+                v-text="$t('entity.validation.pattern', { pattern: 'Region Name' })"
+              >
+                This field should follow pattern for "Region Name".
+              </small>
+            </div>
           </div>
         </div>
         <div>

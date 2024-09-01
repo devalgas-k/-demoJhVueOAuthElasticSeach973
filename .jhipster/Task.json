@@ -1,24 +1,28 @@
 {
   "applications": "*",
   "changelogDate": "20240901000710",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "task",
   "fields": [
     {
       "fieldName": "title",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required", "pattern"],
+      "fieldValidateRulesMaxlength": "256",
+      "fieldValidateRulesPattern": "^[A-Z].*$"
     },
     {
       "fieldName": "description",
-      "fieldType": "String"
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text"
     }
   ],
   "fluentMethods": true,
   "javadoc": "Task entity.\\n@author The JHipster team.",
   "jpaMetamodelFiltering": false,
   "name": "Task",
-  "pagination": "no",
+  "pagination": "pagination",
   "readOnly": false,
   "relationships": [
     {

@@ -25,6 +25,27 @@
             <span v-text="$t('demoJhVueOAuthElasticSearch973App.Language.' + jobHistory.language)">{{ jobHistory.language }}</span>
           </dd>
           <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.file')">File</span>
+          </dt>
+          <dd>
+            <div v-if="jobHistory.file">
+              <a v-on:click="openFile(jobHistory.fileContentType, jobHistory.file)" v-text="$t('entity.action.open')">open</a>
+              {{ jobHistory.fileContentType }}, {{ byteSize(jobHistory.file) }}
+            </div>
+          </dd>
+          <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.date')">Date</span>
+          </dt>
+          <dd>
+            <span v-if="jobHistory.date">{{ $d(Date.parse(jobHistory.date), 'long') }}</span>
+          </dd>
+          <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.duration')">Duration</span>
+          </dt>
+          <dd>
+            <span>{{ jobHistory.duration | duration }} ({{ jobHistory.duration }})</span>
+          </dd>
+          <dt>
             <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.job')">Job</span>
           </dt>
           <dd>

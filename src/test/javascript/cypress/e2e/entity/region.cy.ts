@@ -91,6 +91,9 @@ describe('Region e2e test', () => {
             },
             {
               statusCode: 200,
+              headers: {
+                link: '<http://localhost/api/regions?page=0&size=20>; rel="last",<http://localhost/api/regions?page=0&size=20>; rel="first"',
+              },
               body: [region],
             }
           ).as('entitiesRequestInternal');
@@ -157,7 +160,7 @@ describe('Region e2e test', () => {
     });
 
     it('should create an instance of Region', () => {
-      cy.get(`[data-cy="regionName"]`).type('program').should('have.value', 'program');
+      cy.get(`[data-cy="regionName"]`).type('Dvnojl6').should('have.value', 'Dvnojl6');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

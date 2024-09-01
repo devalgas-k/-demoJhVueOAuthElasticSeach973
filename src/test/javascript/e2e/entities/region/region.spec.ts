@@ -64,7 +64,7 @@ describe('Region e2e test', () => {
     });
 
     it('should create and save Regions', async () => {
-      await updatePage.regionNameInput.sendKeys('regionName');
+      await updatePage.regionNameInput.sendKeys('Mixk3');
 
       expect(await updatePage.saveButton.isEnabled()).to.be.true;
       await updatePage.saveButton.click();
@@ -78,7 +78,7 @@ describe('Region e2e test', () => {
 
     describe('Details, Update, Delete flow', () => {
       after(async () => {
-        const deleteButton = listPage.getDeleteButton(listPage.records.last());
+        const deleteButton = listPage.getDeleteButton(listPage.records.first());
         await click(deleteButton);
 
         deleteDialog = new RegionDeleteDialog();
@@ -96,7 +96,7 @@ describe('Region e2e test', () => {
       });
 
       it('should load details Region page and fetch data', async () => {
-        const detailsButton = listPage.getDetailsButton(listPage.records.last());
+        const detailsButton = listPage.getDetailsButton(listPage.records.first());
         await click(detailsButton);
 
         detailsPage = new RegionDetailsPage();
@@ -111,7 +111,7 @@ describe('Region e2e test', () => {
       });
 
       it('should load edit Region page, fetch data and update', async () => {
-        const editButton = listPage.getEditButton(listPage.records.last());
+        const editButton = listPage.getEditButton(listPage.records.first());
         await click(editButton);
 
         await waitUntilAllDisplayed([updatePage.title, updatePage.footer, updatePage.saveButton]);
@@ -119,7 +119,7 @@ describe('Region e2e test', () => {
         expect(await updatePage.title.getText()).not.to.be.empty;
 
         await updatePage.regionNameInput.clear();
-        await updatePage.regionNameInput.sendKeys('modified');
+        await updatePage.regionNameInput.sendKeys('Joyo3');
 
         await updatePage.saveButton.click();
 

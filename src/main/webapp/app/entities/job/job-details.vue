@@ -25,6 +25,41 @@
             <span>{{ job.maxSalary }}</span>
           </dd>
           <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.subSalary')">Sub Salary</span>
+          </dt>
+          <dd>
+            <span>{{ job.subSalary }}</span>
+          </dd>
+          <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.totalSalary')">Total Salary</span>
+          </dt>
+          <dd>
+            <span>{{ job.totalSalary }}</span>
+          </dd>
+          <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.date')">Date</span>
+          </dt>
+          <dd>
+            <span>{{ job.date }}</span>
+          </dd>
+          <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.codeCode')">Code Code</span>
+          </dt>
+          <dd>
+            <span>{{ job.codeCode }}</span>
+          </dd>
+          <dt>
+            <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.profil')">Profil</span>
+          </dt>
+          <dd>
+            <div v-if="job.profil">
+              <a v-on:click="openFile(job.profilContentType, job.profil)">
+                <img v-bind:src="'data:' + job.profilContentType + ';base64,' + job.profil" style="max-width: 100%" alt="job image" />
+              </a>
+              {{ job.profilContentType }}, {{ byteSize(job.profil) }}
+            </div>
+          </dd>
+          <dt>
             <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.task')">Task</span>
           </dt>
           <dd>

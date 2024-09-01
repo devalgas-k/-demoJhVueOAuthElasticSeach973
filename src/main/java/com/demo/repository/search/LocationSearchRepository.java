@@ -4,10 +4,20 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 import com.demo.domain.Location;
 import com.demo.repository.LocationRepository;
+import java.util.List;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.scheduling.annotation.Async;
@@ -21,9 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 public interface LocationSearchRepository extends ElasticsearchRepository<Location, Long>, LocationSearchRepositoryInternal {}
 
 interface LocationSearchRepositoryInternal {
-    Stream<Location> search(String query);
+    Page<Location> search(String query, Pageable pageable);
 
-    Stream<Location> search(Query query);
+    Page<Location> search(Query query);
 
     void index(Location entity);
 }
@@ -39,14 +49,16 @@ class LocationSearchRepositoryInternalImpl implements LocationSearchRepositoryIn
     }
 
     @Override
-    public Stream<Location> search(String query) {
+    public Page<Location> search(String query, Pageable pageable) {
         NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryStringQuery(query));
-        return search(nativeSearchQuery);
+        return search(nativeSearchQuery.setPageable(pageable));
     }
 
     @Override
-    public Stream<Location> search(Query query) {
-        return elasticsearchTemplate.search(query, Location.class).map(SearchHit::getContent).stream();
+    public Page<Location> search(Query query) {
+        SearchHits<Location> searchHits = elasticsearchTemplate.search(query, Location.class);
+        List<Location> hits = searchHits.map(SearchHit::getContent).stream().collect(Collectors.toList());
+        return new PageImpl<>(hits, query.getPageable(), searchHits.getTotalHits());
     }
 
     @Override

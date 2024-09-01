@@ -4,10 +4,20 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 import com.demo.domain.Department;
 import com.demo.repository.DepartmentRepository;
+import java.util.List;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.scheduling.annotation.Async;
@@ -21,9 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 public interface DepartmentSearchRepository extends ElasticsearchRepository<Department, Long>, DepartmentSearchRepositoryInternal {}
 
 interface DepartmentSearchRepositoryInternal {
-    Stream<Department> search(String query);
+    Page<Department> search(String query, Pageable pageable);
 
-    Stream<Department> search(Query query);
+    Page<Department> search(Query query);
 
     void index(Department entity);
 }
@@ -39,14 +49,16 @@ class DepartmentSearchRepositoryInternalImpl implements DepartmentSearchReposito
     }
 
     @Override
-    public Stream<Department> search(String query) {
+    public Page<Department> search(String query, Pageable pageable) {
         NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryStringQuery(query));
-        return search(nativeSearchQuery);
+        return search(nativeSearchQuery.setPageable(pageable));
     }
 
     @Override
-    public Stream<Department> search(Query query) {
-        return elasticsearchTemplate.search(query, Department.class).map(SearchHit::getContent).stream();
+    public Page<Department> search(Query query) {
+        SearchHits<Department> searchHits = elasticsearchTemplate.search(query, Department.class);
+        List<Department> hits = searchHits.map(SearchHit::getContent).stream().collect(Collectors.toList());
+        return new PageImpl<>(hits, query.getPageable(), searchHits.getTotalHits());
     }
 
     @Override

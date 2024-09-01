@@ -3,7 +3,9 @@ package com.demo.domain;
 import com.demo.domain.enumeration.Language;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -35,6 +37,19 @@ public class JobHistory implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "language")
     private Language language;
+
+    @Lob
+    @Column(name = "file")
+    private byte[] file;
+
+    @Column(name = "file_content_type")
+    private String fileContentType;
+
+    @Column(name = "date")
+    private ZonedDateTime date;
+
+    @Column(name = "duration")
+    private Duration duration;
 
     @JsonIgnoreProperties(value = { "tasks", "employee" }, allowSetters = true)
     @OneToOne
@@ -105,6 +120,58 @@ public class JobHistory implements Serializable {
         this.language = language;
     }
 
+    public byte[] getFile() {
+        return this.file;
+    }
+
+    public JobHistory file(byte[] file) {
+        this.setFile(file);
+        return this;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
+    }
+
+    public String getFileContentType() {
+        return this.fileContentType;
+    }
+
+    public JobHistory fileContentType(String fileContentType) {
+        this.fileContentType = fileContentType;
+        return this;
+    }
+
+    public void setFileContentType(String fileContentType) {
+        this.fileContentType = fileContentType;
+    }
+
+    public ZonedDateTime getDate() {
+        return this.date;
+    }
+
+    public JobHistory date(ZonedDateTime date) {
+        this.setDate(date);
+        return this;
+    }
+
+    public void setDate(ZonedDateTime date) {
+        this.date = date;
+    }
+
+    public Duration getDuration() {
+        return this.duration;
+    }
+
+    public JobHistory duration(Duration duration) {
+        this.setDuration(duration);
+        return this;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
     public Job getJob() {
         return this.job;
     }
@@ -171,6 +238,10 @@ public class JobHistory implements Serializable {
             ", startDate='" + getStartDate() + "'" +
             ", endDate='" + getEndDate() + "'" +
             ", language='" + getLanguage() + "'" +
+            ", file='" + getFile() + "'" +
+            ", fileContentType='" + getFileContentType() + "'" +
+            ", date='" + getDate() + "'" +
+            ", duration='" + getDuration() + "'" +
             "}";
     }
 }

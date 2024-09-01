@@ -6,12 +6,13 @@ import com.demo.domain.Department;
 import com.demo.repository.DepartmentRepository;
 import com.demo.repository.search.DepartmentSearchRepository;
 import com.demo.service.DepartmentService;
-import java.util.List;
+import com.demo.service.dto.DepartmentDTO;
+import com.demo.service.mapper.DepartmentMapper;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,39 +27,48 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     private final DepartmentRepository departmentRepository;
 
+    private final DepartmentMapper departmentMapper;
+
     private final DepartmentSearchRepository departmentSearchRepository;
 
-    public DepartmentServiceImpl(DepartmentRepository departmentRepository, DepartmentSearchRepository departmentSearchRepository) {
+    public DepartmentServiceImpl(
+        DepartmentRepository departmentRepository,
+        DepartmentMapper departmentMapper,
+        DepartmentSearchRepository departmentSearchRepository
+    ) {
         this.departmentRepository = departmentRepository;
+        this.departmentMapper = departmentMapper;
         this.departmentSearchRepository = departmentSearchRepository;
     }
 
     @Override
-    public Department save(Department department) {
-        log.debug("Request to save Department : {}", department);
-        Department result = departmentRepository.save(department);
-        departmentSearchRepository.index(result);
+    public DepartmentDTO save(DepartmentDTO departmentDTO) {
+        log.debug("Request to save Department : {}", departmentDTO);
+        Department department = departmentMapper.toEntity(departmentDTO);
+        department = departmentRepository.save(department);
+        DepartmentDTO result = departmentMapper.toDto(department);
+        departmentSearchRepository.index(department);
         return result;
     }
 
     @Override
-    public Department update(Department department) {
-        log.debug("Request to update Department : {}", department);
-        Department result = departmentRepository.save(department);
-        departmentSearchRepository.index(result);
+    public DepartmentDTO update(DepartmentDTO departmentDTO) {
+        log.debug("Request to update Department : {}", departmentDTO);
+        Department department = departmentMapper.toEntity(departmentDTO);
+        department = departmentRepository.save(department);
+        DepartmentDTO result = departmentMapper.toDto(department);
+        departmentSearchRepository.index(department);
         return result;
     }
 
     @Override
-    public Optional<Department> partialUpdate(Department department) {
-        log.debug("Request to partially update Department : {}", department);
+    public Optional<DepartmentDTO> partialUpdate(DepartmentDTO departmentDTO) {
+        log.debug("Request to partially update Department : {}", departmentDTO);
 
         return departmentRepository
-            .findById(department.getId())
+            .findById(departmentDTO.getId())
             .map(existingDepartment -> {
-                if (department.getDepartmentName() != null) {
-                    existingDepartment.setDepartmentName(department.getDepartmentName());
-                }
+                departmentMapper.partialUpdate(existingDepartment, departmentDTO);
 
                 return existingDepartment;
             })
@@ -67,21 +77,22 @@ public class DepartmentServiceImpl implements DepartmentService {
                 departmentSearchRepository.save(savedDepartment);
 
                 return savedDepartment;
-            });
+            })
+            .map(departmentMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Department> findAll() {
+    public Page<DepartmentDTO> findAll(Pageable pageable) {
         log.debug("Request to get all Departments");
-        return departmentRepository.findAll();
+        return departmentRepository.findAll(pageable).map(departmentMapper::toDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Department> findOne(Long id) {
+    public Optional<DepartmentDTO> findOne(Long id) {
         log.debug("Request to get Department : {}", id);
-        return departmentRepository.findById(id);
+        return departmentRepository.findById(id).map(departmentMapper::toDto);
     }
 
     @Override
@@ -93,8 +104,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Department> search(String query) {
-        log.debug("Request to search Departments for query {}", query);
-        return StreamSupport.stream(departmentSearchRepository.search(query).spliterator(), false).collect(Collectors.toList());
+    public Page<DepartmentDTO> search(String query, Pageable pageable) {
+        log.debug("Request to search for a page of Departments for query {}", query);
+        return departmentSearchRepository.search(query, pageable).map(departmentMapper::toDto);
     }
 }

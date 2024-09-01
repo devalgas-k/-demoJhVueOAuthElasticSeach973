@@ -12,12 +12,13 @@ import com.demo.IntegrationTest;
 import com.demo.domain.Task;
 import com.demo.repository.TaskRepository;
 import com.demo.repository.search.TaskSearchRepository;
+import com.demo.service.dto.TaskDTO;
+import com.demo.service.mapper.TaskMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import org.apache.commons.collections4.IterableUtils;
 import org.assertj.core.util.IterableUtil;
@@ -26,10 +27,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Base64Utils;
 
 /**
  * Integration tests for the {@link TaskResource} REST controller.
@@ -54,6 +59,9 @@ class TaskResourceIT {
 
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskMapper taskMapper;
 
     @Autowired
     private TaskSearchRepository taskSearchRepository;
@@ -105,9 +113,13 @@ class TaskResourceIT {
         int databaseSizeBeforeCreate = taskRepository.findAll().size();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
         // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
         restTaskMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(task))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isCreated());
 
@@ -130,6 +142,7 @@ class TaskResourceIT {
     void createTaskWithExistingId() throws Exception {
         // Create the Task with an existing ID
         task.setId(1L);
+        TaskDTO taskDTO = taskMapper.toDto(task);
 
         int databaseSizeBeforeCreate = taskRepository.findAll().size();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
@@ -137,13 +150,42 @@ class TaskResourceIT {
         // An entity with an existing ID cannot be created, so this API call must fail
         restTaskMockMvc
             .perform(
-                post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(task))
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isBadRequest());
 
         // Validate the Task in the database
         List<Task> taskList = taskRepository.findAll();
         assertThat(taskList).hasSize(databaseSizeBeforeCreate);
+        int searchDatabaseSizeAfter = IterableUtil.sizeOf(taskSearchRepository.findAll());
+        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
+    }
+
+    @Test
+    @Transactional
+    void checkTitleIsRequired() throws Exception {
+        int databaseSizeBeforeTest = taskRepository.findAll().size();
+        int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
+        // set the field null
+        task.setTitle(null);
+
+        // Create the Task, which fails.
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
+        restTaskMockMvc
+            .perform(
+                post(ENTITY_API_URL)
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
+            )
+            .andExpect(status().isBadRequest());
+
+        List<Task> taskList = taskRepository.findAll();
+        assertThat(taskList).hasSize(databaseSizeBeforeTest);
         int searchDatabaseSizeAfter = IterableUtil.sizeOf(taskSearchRepository.findAll());
         assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
     }
@@ -161,7 +203,7 @@ class TaskResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
     }
 
     @Test
@@ -177,7 +219,7 @@ class TaskResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(task.getId().intValue()))
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION));
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION.toString()));
     }
 
     @Test
@@ -202,13 +244,14 @@ class TaskResourceIT {
         // Disconnect from session so that the updates on updatedTask are not directly saved in db
         em.detach(updatedTask);
         updatedTask.title(UPDATED_TITLE).description(UPDATED_DESCRIPTION);
+        TaskDTO taskDTO = taskMapper.toDto(updatedTask);
 
         restTaskMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedTask.getId())
+                put(ENTITY_API_URL_ID, taskDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedTask))
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isOk());
 
@@ -237,13 +280,16 @@ class TaskResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
         task.setId(count.incrementAndGet());
 
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, task.getId())
+                put(ENTITY_API_URL_ID, taskDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(task))
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -261,13 +307,16 @@ class TaskResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
         task.setId(count.incrementAndGet());
 
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(task))
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -285,10 +334,13 @@ class TaskResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
         task.setId(count.incrementAndGet());
 
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
-                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(task))
+                put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -368,13 +420,16 @@ class TaskResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
         task.setId(count.incrementAndGet());
 
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, task.getId())
+                patch(ENTITY_API_URL_ID, taskDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(task))
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -392,13 +447,16 @@ class TaskResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
         task.setId(count.incrementAndGet());
 
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(task))
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -416,13 +474,16 @@ class TaskResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(taskSearchRepository.findAll());
         task.setId(count.incrementAndGet());
 
+        // Create the Task
+        TaskDTO taskDTO = taskMapper.toDto(task);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restTaskMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(task))
+                    .content(TestUtil.convertObjectToJsonBytes(taskDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -471,6 +532,6 @@ class TaskResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(task.getId().intValue())))
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
     }
 }

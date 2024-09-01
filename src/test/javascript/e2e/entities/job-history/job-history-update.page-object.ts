@@ -13,6 +13,13 @@ export default class JobHistoryUpdatePage extends AlertPage {
   endDateInput: ElementFinder = element(by.css('input#job-history-endDate'));
 
   languageSelect = element(by.css('select#job-history-language'));
+
+  fileInput: ElementFinder = element(by.css('input#file_file'));
+
+  dateInput: ElementFinder = element(by.css('input#job-history-date'));
+
+  durationInput: ElementFinder = element(by.css('input#job-history-duration'));
+
   jobSelect = element(by.css('select#job-history-job'));
 
   departmentSelect = element(by.css('select#job-history-department'));

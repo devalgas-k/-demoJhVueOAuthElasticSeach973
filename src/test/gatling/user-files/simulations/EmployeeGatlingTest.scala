@@ -107,6 +107,9 @@ class EmployeeGatlingTest extends Simulation {
                 , "hireDate":"2020-01-01T00:00:00.000Z"
                 , "salary":"0"
                 , "commissionPct":"0"
+                , "level":"0"
+                , "contract":"CDI"
+                , "cv":null
                 }""")).asJson
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_employee_url"))).exitHereIfFailed

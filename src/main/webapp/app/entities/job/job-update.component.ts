@@ -1,4 +1,9 @@
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject } from 'vue-property-decorator';
+
+import { mixins } from 'vue-class-component';
+import JhiDataUtils from '@/shared/data/data-utils.service';
+
+import { required } from 'vuelidate/lib/validators';
 
 import AlertService from '@/shared/alert/alert.service';
 
@@ -13,16 +18,25 @@ import JobService from './job.service';
 
 const validations: any = {
   job: {
-    jobTitle: {},
+    jobTitle: {
+      required,
+    },
     minSalary: {},
     maxSalary: {},
+    subSalary: {},
+    totalSalary: {},
+    date: {},
+    codeCode: {},
+    profil: {
+      required,
+    },
   },
 };
 
 @Component({
   validations,
 })
-export default class JobUpdate extends Vue {
+export default class JobUpdate extends mixins(JhiDataUtils) {
   @Inject('jobService') private jobService: () => JobService;
   @Inject('alertService') private alertService: () => AlertService;
 
@@ -114,6 +128,20 @@ export default class JobUpdate extends Vue {
 
   public previousState(): void {
     this.$router.go(-1);
+  }
+
+  public clearInputImage(field, fieldContentType, idInput): void {
+    if (this.job && field && fieldContentType) {
+      if (Object.prototype.hasOwnProperty.call(this.job, field)) {
+        this.job[field] = null;
+      }
+      if (Object.prototype.hasOwnProperty.call(this.job, fieldContentType)) {
+        this.job[fieldContentType] = null;
+      }
+      if (idInput) {
+        (<any>this).$refs[idInput] = null;
+      }
+    }
   }
 
   public initRelationships(): void {

@@ -1,18 +1,18 @@
 package com.demo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 /**
  * Task entity.\n@author The JHipster team.
  */
-@Schema(description = "Task entity.\n@author The JHipster team.")
 @Entity
 @Table(name = "task")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -28,9 +28,14 @@ public class Task implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "title")
+    @NotNull
+    @Size(max = 256)
+    @Pattern(regexp = "^[A-Z].*$")
+    @Column(name = "title", length = 256, nullable = false)
     private String title;
 
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "description")
     private String description;
 

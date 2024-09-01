@@ -66,6 +66,18 @@
               <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.language')">Language</span>
               <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'language'"></jhi-sort-indicator>
             </th>
+            <th scope="row" v-on:click="changeOrder('file')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.file')">File</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'file'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('date')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.date')">Date</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'date'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('duration')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.duration')">Duration</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'duration'"></jhi-sort-indicator>
+            </th>
             <th scope="row" v-on:click="changeOrder('job.id')">
               <span v-text="$t('demoJhVueOAuthElasticSearch973App.jobHistory.job')">Job</span>
               <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'job.id'"></jhi-sort-indicator>
@@ -89,6 +101,14 @@
             <td>{{ jobHistory.startDate ? $d(Date.parse(jobHistory.startDate), 'short') : '' }}</td>
             <td>{{ jobHistory.endDate ? $d(Date.parse(jobHistory.endDate), 'short') : '' }}</td>
             <td v-text="$t('demoJhVueOAuthElasticSearch973App.Language.' + jobHistory.language)">{{ jobHistory.language }}</td>
+            <td>
+              <a v-if="jobHistory.file" v-on:click="openFile(jobHistory.fileContentType, jobHistory.file)" v-text="$t('entity.action.open')"
+                >open</a
+              >
+              <span v-if="jobHistory.file">{{ jobHistory.fileContentType }}, {{ byteSize(jobHistory.file) }}</span>
+            </td>
+            <td>{{ jobHistory.date ? $d(Date.parse(jobHistory.date), 'short') : '' }}</td>
+            <td>{{ jobHistory.duration | duration }}</td>
             <td>
               <div v-if="jobHistory.job">
                 <router-link :to="{ name: 'JobView', params: { jobId: jobHistory.job.id } }">{{ jobHistory.job.id }}</router-link>
@@ -136,16 +156,6 @@
             </td>
           </tr>
         </tbody>
-        <infinite-loading
-          ref="infiniteLoading"
-          v-if="totalItems > itemsPerPage"
-          :identifier="infiniteId"
-          slot="append"
-          @infinite="loadMore"
-          force-use-infinite-wrapper=".el-table__body-wrapper"
-          :distance="20"
-        >
-        </infinite-loading>
       </table>
     </div>
     <b-modal ref="removeEntity" id="removeEntity">
@@ -176,6 +186,14 @@
         </button>
       </div>
     </b-modal>
+    <div v-show="jobHistories && jobHistories.length > 0">
+      <div class="row justify-content-center">
+        <jhi-item-count :page="page" :total="queryCount" :itemsPerPage="itemsPerPage"></jhi-item-count>
+      </div>
+      <div class="row justify-content-center">
+        <b-pagination size="md" :total-rows="totalItems" v-model="page" :per-page="itemsPerPage" :change="loadPage(page)"></b-pagination>
+      </div>
+    </div>
   </div>
 </template>
 

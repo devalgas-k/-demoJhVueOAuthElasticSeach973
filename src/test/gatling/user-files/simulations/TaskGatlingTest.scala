@@ -101,7 +101,7 @@ class TaskGatlingTest extends Simulation {
             .headers(headers_http_authenticated)
             .body(StringBody("""{
                 "title":"SAMPLE_TEXT"
-                , "description":"SAMPLE_TEXT"
+                , "description":null
                 }""")).asJson
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_task_url"))).exitHereIfFailed

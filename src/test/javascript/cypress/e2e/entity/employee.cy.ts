@@ -15,7 +15,7 @@ describe('Employee e2e test', () => {
   const employeePageUrlPattern = new RegExp('/employee(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const employeeSample = {};
+  const employeeSample = { email: "*E=j;@M2.3z.70'r" };
 
   let employee;
 
@@ -164,16 +164,24 @@ describe('Employee e2e test', () => {
 
       cy.get(`[data-cy="lastName"]`).type('Cousin').should('have.value', 'Cousin');
 
-      cy.get(`[data-cy="email"]`).type('Audeline_Henry41@hotmail.fr').should('have.value', 'Audeline_Henry41@hotmail.fr');
+      cy.get(`[data-cy="email"]`).type('-8sRHr@5.*Mv').should('have.value', '-8sRHr@5.*Mv');
 
-      cy.get(`[data-cy="phoneNumber"]`).type('Electronics Sleek back-end').should('have.value', 'Electronics Sleek back-end');
+      cy.get(`[data-cy="phoneNumber"]`).type('Shirt c Borders').should('have.value', 'Shirt c Borders');
 
-      cy.get(`[data-cy="hireDate"]`).type('2024-08-31T05:40').blur().should('have.value', '2024-08-31T05:40');
+      cy.get(`[data-cy="hireDate"]`).type('2024-08-31T07:20').blur().should('have.value', '2024-08-31T07:20');
 
-      cy.get(`[data-cy="salary"]`).type('91292').should('have.value', '91292');
+      cy.get(`[data-cy="salary"]`).type('58103').should('have.value', '58103');
 
-      cy.get(`[data-cy="commissionPct"]`).type('70377').should('have.value', '70377');
+      cy.get(`[data-cy="commissionPct"]`).type('25470').should('have.value', '25470');
 
+      cy.get(`[data-cy="level"]`).type('14').should('have.value', '14');
+
+      cy.get(`[data-cy="contract"]`).select('FREELANCE');
+
+      cy.setFieldImageAsBytesOfEntity('cv', 'integration-test.png', 'image/png');
+
+      // since cypress clicks submit too fast before the blob fields are validated
+      cy.wait(200); // eslint-disable-line cypress/no-unnecessary-waiting
       cy.get(entityCreateSaveButtonSelector).click();
 
       cy.wait('@postEntityRequest').then(({ response }) => {

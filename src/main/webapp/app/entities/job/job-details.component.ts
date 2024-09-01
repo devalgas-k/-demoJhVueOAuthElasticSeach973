@@ -1,11 +1,14 @@
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject } from 'vue-property-decorator';
+
+import { mixins } from 'vue-class-component';
+import JhiDataUtils from '@/shared/data/data-utils.service';
 
 import { IJob } from '@/shared/model/job.model';
 import JobService from './job.service';
 import AlertService from '@/shared/alert/alert.service';
 
 @Component
-export default class JobDetails extends Vue {
+export default class JobDetails extends mixins(JhiDataUtils) {
   @Inject('jobService') private jobService: () => JobService;
   @Inject('alertService') private alertService: () => AlertService;
 

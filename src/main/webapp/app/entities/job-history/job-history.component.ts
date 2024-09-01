@@ -24,8 +24,6 @@ export default class JobHistory extends mixins(JhiDataUtils) {
   public propOrder = 'id';
   public reverse = false;
   public totalItems = 0;
-  public infiniteId = +new Date();
-  public links = {};
 
   public jobHistories: IJobHistory[] = [];
 
@@ -46,16 +44,6 @@ export default class JobHistory extends mixins(JhiDataUtils) {
   public clear(): void {
     this.currentSearch = '';
     this.page = 1;
-    this.links = {};
-    this.infiniteId += 1;
-    this.jobHistories = [];
-    this.retrieveAllJobHistorys();
-  }
-
-  public reset(): void {
-    this.page = 1;
-    this.infiniteId += 1;
-    this.jobHistories = [];
     this.retrieveAllJobHistorys();
   }
 
@@ -71,23 +59,10 @@ export default class JobHistory extends mixins(JhiDataUtils) {
         .search(this.currentSearch, paginationQuery)
         .then(
           res => {
-            if (res.data && res.data.length > 0) {
-              for (let i = 0; i < res.data.length; i++) {
-                this.jobHistories.push(res.data[i]);
-              }
-              if (res.headers && res.headers['link']) {
-                this.links = this.parseLinks(res.headers['link']);
-              }
-            }
+            this.jobHistories = res.data;
             this.totalItems = Number(res.headers['x-total-count']);
             this.queryCount = this.totalItems;
             this.isFetching = false;
-            if (<any>this.$refs.infiniteLoading) {
-              (<any>this.$refs.infiniteLoading).stateChanger.loaded();
-              if (JSON.stringify(this.links) !== JSON.stringify({}) && this.page > this.links['last']) {
-                (<any>this.$refs.infiniteLoading).stateChanger.complete();
-              }
-            }
           },
           err => {
             this.isFetching = false;
@@ -100,23 +75,10 @@ export default class JobHistory extends mixins(JhiDataUtils) {
       .retrieve(paginationQuery)
       .then(
         res => {
-          if (res.data && res.data.length > 0) {
-            for (let i = 0; i < res.data.length; i++) {
-              this.jobHistories.push(res.data[i]);
-            }
-            if (res.headers && res.headers['link']) {
-              this.links = this.parseLinks(res.headers['link']);
-            }
-          }
+          this.jobHistories = res.data;
           this.totalItems = Number(res.headers['x-total-count']);
           this.queryCount = this.totalItems;
           this.isFetching = false;
-          if (<any>this.$refs.infiniteLoading) {
-            (<any>this.$refs.infiniteLoading).stateChanger.loaded();
-            if (JSON.stringify(this.links) !== JSON.stringify({}) && this.page > this.links['last']) {
-              (<any>this.$refs.infiniteLoading).stateChanger.complete();
-            }
-          }
         },
         err => {
           this.isFetching = false;
@@ -149,19 +111,12 @@ export default class JobHistory extends mixins(JhiDataUtils) {
           autoHideDelay: 5000,
         });
         this.removeId = null;
-        this.reset();
+        this.retrieveAllJobHistorys();
         this.closeDialog();
       })
       .catch(error => {
         this.alertService().showHttpError(this, error.response);
       });
-  }
-
-  public loadMore($state): void {
-    if (!this.isFetching) {
-      this.page++;
-      this.transition();
-    }
   }
 
   public sort(): Array<any> {
@@ -186,7 +141,7 @@ export default class JobHistory extends mixins(JhiDataUtils) {
   public changeOrder(propOrder): void {
     this.propOrder = propOrder;
     this.reverse = !this.reverse;
-    this.reset();
+    this.transition();
   }
 
   public closeDialog(): void {

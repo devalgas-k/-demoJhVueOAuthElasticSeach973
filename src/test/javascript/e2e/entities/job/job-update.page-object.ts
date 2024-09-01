@@ -14,6 +14,16 @@ export default class JobUpdatePage extends AlertPage {
 
   maxSalaryInput: ElementFinder = element(by.css('input#job-maxSalary'));
 
+  subSalaryInput: ElementFinder = element(by.css('input#job-subSalary'));
+
+  totalSalaryInput: ElementFinder = element(by.css('input#job-totalSalary'));
+
+  dateInput: ElementFinder = element(by.css('input#job-date'));
+
+  codeCodeInput: ElementFinder = element(by.css('input#job-codeCode'));
+
+  profilInput: ElementFinder = element(by.css('input#file_profil'));
+
   taskSelect = element(by.css('select#job-task'));
 
   employeeSelect = element(by.css('select#job-employee'));

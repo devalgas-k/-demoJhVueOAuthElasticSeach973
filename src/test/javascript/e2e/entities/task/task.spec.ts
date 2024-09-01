@@ -64,8 +64,9 @@ describe('Task e2e test', () => {
     });
 
     it('should create and save Tasks', async () => {
-      await updatePage.titleInput.sendKeys('title');
+      await updatePage.titleInput.sendKeys('Ul');
 
+      await waitUntilDisplayed(updatePage.descriptionInput);
       await updatePage.descriptionInput.sendKeys('description');
 
       expect(await updatePage.saveButton.isEnabled()).to.be.true;
@@ -80,7 +81,7 @@ describe('Task e2e test', () => {
 
     describe('Details, Update, Delete flow', () => {
       after(async () => {
-        const deleteButton = listPage.getDeleteButton(listPage.records.last());
+        const deleteButton = listPage.getDeleteButton(listPage.records.first());
         await click(deleteButton);
 
         deleteDialog = new TaskDeleteDialog();
@@ -98,7 +99,7 @@ describe('Task e2e test', () => {
       });
 
       it('should load details Task page and fetch data', async () => {
-        const detailsButton = listPage.getDetailsButton(listPage.records.last());
+        const detailsButton = listPage.getDetailsButton(listPage.records.first());
         await click(detailsButton);
 
         detailsPage = new TaskDetailsPage();
@@ -113,7 +114,7 @@ describe('Task e2e test', () => {
       });
 
       it('should load edit Task page, fetch data and update', async () => {
-        const editButton = listPage.getEditButton(listPage.records.last());
+        const editButton = listPage.getEditButton(listPage.records.first());
         await click(editButton);
 
         await waitUntilAllDisplayed([updatePage.title, updatePage.footer, updatePage.saveButton]);
@@ -121,10 +122,10 @@ describe('Task e2e test', () => {
         expect(await updatePage.title.getText()).not.to.be.empty;
 
         await updatePage.titleInput.clear();
-        await updatePage.titleInput.sendKeys('modified');
+        await updatePage.titleInput.sendKeys('IHP[=');
 
         await updatePage.descriptionInput.clear();
-        await updatePage.descriptionInput.sendKeys('modified');
+        await updatePage.descriptionInput.sendKeys('updateddescription');
 
         await updatePage.saveButton.click();
 

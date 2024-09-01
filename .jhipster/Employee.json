@@ -1,7 +1,7 @@
 {
   "applications": "*",
   "changelogDate": "20240901000711",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "employee",
   "fields": [
@@ -16,7 +16,9 @@
     },
     {
       "fieldName": "email",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "pattern"],
+      "fieldValidateRulesPattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
     },
     {
       "fieldName": "phoneNumber",
@@ -33,13 +35,31 @@
     {
       "fieldName": "commissionPct",
       "fieldType": "Long"
+    },
+    {
+      "fieldName": "level",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min", "max"],
+      "fieldValidateRulesMax": "14",
+      "fieldValidateRulesMin": "1"
+    },
+    {
+      "fieldName": "contract",
+      "fieldType": "Contract",
+      "fieldTypeJavadoc": "This is a contract\\ncontract am enum",
+      "fieldValues": "CDI (Permanent contract),CDD (Fixed-term contract),FREELANCE (Freelance)"
+    },
+    {
+      "fieldName": "cv",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "any"
     }
   ],
   "fluentMethods": true,
   "javadoc": "The Employee entity.",
   "jpaMetamodelFiltering": false,
   "name": "Employee",
-  "pagination": "infinite-scroll",
+  "pagination": "pagination",
   "readOnly": false,
   "relationships": [
     {
@@ -61,5 +81,5 @@
       "relationshipType": "many-to-one"
     }
   ],
-  "service": "no"
+  "service": "serviceClass"
 }

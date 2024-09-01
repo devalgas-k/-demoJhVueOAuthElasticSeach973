@@ -1,4 +1,9 @@
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject } from 'vue-property-decorator';
+
+import { mixins } from 'vue-class-component';
+import JhiDataUtils from '@/shared/data/data-utils.service';
+
+import { required, maxLength } from 'vuelidate/lib/validators';
 
 import AlertService from '@/shared/alert/alert.service';
 
@@ -10,7 +15,10 @@ import TaskService from './task.service';
 
 const validations: any = {
   task: {
-    title: {},
+    title: {
+      required,
+      maxLength: maxLength(256),
+    },
     description: {},
   },
 };
@@ -18,7 +26,7 @@ const validations: any = {
 @Component({
   validations,
 })
-export default class TaskUpdate extends Vue {
+export default class TaskUpdate extends mixins(JhiDataUtils) {
   @Inject('taskService') private taskService: () => TaskService;
   @Inject('alertService') private alertService: () => AlertService;
 

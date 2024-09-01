@@ -8,6 +8,10 @@ export interface IJobHistory {
   startDate?: Date | null;
   endDate?: Date | null;
   language?: Language | null;
+  fileContentType?: string | null;
+  file?: string | null;
+  date?: Date | null;
+  duration?: string | null;
   job?: IJob | null;
   department?: IDepartment | null;
   employee?: IEmployee | null;
@@ -19,6 +23,10 @@ export class JobHistory implements IJobHistory {
     public startDate?: Date | null,
     public endDate?: Date | null,
     public language?: Language | null,
+    public fileContentType?: string | null,
+    public file?: string | null,
+    public date?: Date | null,
+    public duration?: string | null,
     public job?: IJob | null,
     public department?: IDepartment | null,
     public employee?: IEmployee | null

@@ -1,4 +1,7 @@
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject } from 'vue-property-decorator';
+
+import { mixins } from 'vue-class-component';
+import JhiDataUtils from '@/shared/data/data-utils.service';
 
 import dayjs from 'dayjs';
 import { DATE_TIME_LONG_FORMAT } from '@/shared/date/filters';
@@ -23,13 +26,16 @@ const validations: any = {
     startDate: {},
     endDate: {},
     language: {},
+    file: {},
+    date: {},
+    duration: {},
   },
 };
 
 @Component({
   validations,
 })
-export default class JobHistoryUpdate extends Vue {
+export default class JobHistoryUpdate extends mixins(JhiDataUtils) {
   @Inject('jobHistoryService') private jobHistoryService: () => JobHistoryService;
   @Inject('alertService') private alertService: () => AlertService;
 
@@ -141,6 +147,7 @@ export default class JobHistoryUpdate extends Vue {
       .then(res => {
         res.startDate = new Date(res.startDate);
         res.endDate = new Date(res.endDate);
+        res.date = new Date(res.date);
         this.jobHistory = res;
       })
       .catch(error => {

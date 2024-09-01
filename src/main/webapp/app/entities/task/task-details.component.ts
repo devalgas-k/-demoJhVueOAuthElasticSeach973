@@ -1,11 +1,14 @@
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject } from 'vue-property-decorator';
+
+import { mixins } from 'vue-class-component';
+import JhiDataUtils from '@/shared/data/data-utils.service';
 
 import { ITask } from '@/shared/model/task.model';
 import TaskService from './task.service';
 import AlertService from '@/shared/alert/alert.service';
 
 @Component
-export default class TaskDetails extends Vue {
+export default class TaskDetails extends mixins(JhiDataUtils) {
   @Inject('taskService') private taskService: () => TaskService;
   @Inject('alertService') private alertService: () => AlertService;
 

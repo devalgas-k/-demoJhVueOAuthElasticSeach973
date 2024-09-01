@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { DATE_TIME_FORMAT } from '@/shared/date/filters';
 import EmployeeService from '@/entities/employee/employee.service';
 import { Employee } from '@/shared/model/employee.model';
+import { Contract } from '@/shared/model/enumerations/contract.model';
 
 const error = {
   response: {
@@ -33,7 +34,20 @@ describe('Service Tests', () => {
     beforeEach(() => {
       service = new EmployeeService();
       currentDate = new Date();
-      elemDefault = new Employee(123, 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', 'AAAAAAA', currentDate, 0, 0);
+      elemDefault = new Employee(
+        123,
+        'AAAAAAA',
+        'AAAAAAA',
+        'AAAAAAA',
+        'AAAAAAA',
+        currentDate,
+        0,
+        0,
+        0,
+        Contract.CDI,
+        'image/png',
+        'AAAAAAA'
+      );
     });
 
     describe('Service methods', () => {
@@ -103,6 +117,9 @@ describe('Service Tests', () => {
             hireDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             salary: 1,
             commissionPct: 1,
+            level: 1,
+            contract: 'BBBBBB',
+            cv: 'BBBBBB',
           },
           elemDefault
         );
@@ -140,6 +157,9 @@ describe('Service Tests', () => {
             hireDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             salary: 1,
             commissionPct: 1,
+            level: 1,
+            contract: 'BBBBBB',
+            cv: 'BBBBBB',
           },
           new Employee()
         );
@@ -179,6 +199,9 @@ describe('Service Tests', () => {
             hireDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             salary: 1,
             commissionPct: 1,
+            level: 1,
+            contract: 'BBBBBB',
+            cv: 'BBBBBB',
           },
           elemDefault
         );

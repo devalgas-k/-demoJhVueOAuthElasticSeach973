@@ -1,21 +1,44 @@
 {
   "applications": "*",
   "changelogDate": "20240901000712",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "job",
   "fields": [
     {
       "fieldName": "jobTitle",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["unique", "required"]
     },
     {
       "fieldName": "minSalary",
-      "fieldType": "Long"
+      "fieldType": "BigDecimal"
     },
     {
       "fieldName": "maxSalary",
       "fieldType": "Long"
+    },
+    {
+      "fieldName": "subSalary",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "totalSalary",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "codeCode",
+      "fieldType": "UUID"
+    },
+    {
+      "fieldName": "profil",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "image",
+      "fieldValidateRules": ["required"]
     }
   ],
   "fluentMethods": true,
@@ -39,5 +62,5 @@
       "relationshipType": "many-to-one"
     }
   ],
-  "service": "no"
+  "service": "serviceClass"
 }

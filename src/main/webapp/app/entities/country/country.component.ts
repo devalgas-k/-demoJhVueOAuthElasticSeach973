@@ -14,6 +14,13 @@ export default class Country extends Vue {
 
   public currentSearch = '';
   private removeId: number = null;
+  public itemsPerPage = 20;
+  public queryCount: number = null;
+  public page = 1;
+  public previousPage = 1;
+  public propOrder = 'id';
+  public reverse = false;
+  public totalItems = 0;
 
   public countries: ICountry[] = [];
 
@@ -33,17 +40,25 @@ export default class Country extends Vue {
 
   public clear(): void {
     this.currentSearch = '';
+    this.page = 1;
     this.retrieveAllCountrys();
   }
 
   public retrieveAllCountrys(): void {
     this.isFetching = true;
+    const paginationQuery = {
+      page: this.page - 1,
+      size: this.itemsPerPage,
+      sort: this.sort(),
+    };
     if (this.currentSearch) {
       this.countryService()
-        .search(this.currentSearch)
+        .search(this.currentSearch, paginationQuery)
         .then(
           res => {
-            this.countries = res;
+            this.countries = res.data;
+            this.totalItems = Number(res.headers['x-total-count']);
+            this.queryCount = this.totalItems;
             this.isFetching = false;
           },
           err => {
@@ -54,10 +69,12 @@ export default class Country extends Vue {
       return;
     }
     this.countryService()
-      .retrieve()
+      .retrieve(paginationQuery)
       .then(
         res => {
           this.countries = res.data;
+          this.totalItems = Number(res.headers['x-total-count']);
+          this.queryCount = this.totalItems;
           this.isFetching = false;
         },
         err => {
@@ -97,6 +114,31 @@ export default class Country extends Vue {
       .catch(error => {
         this.alertService().showHttpError(this, error.response);
       });
+  }
+
+  public sort(): Array<any> {
+    const result = [this.propOrder + ',' + (this.reverse ? 'desc' : 'asc')];
+    if (this.propOrder !== 'id') {
+      result.push('id');
+    }
+    return result;
+  }
+
+  public loadPage(page: number): void {
+    if (page !== this.previousPage) {
+      this.previousPage = page;
+      this.transition();
+    }
+  }
+
+  public transition(): void {
+    this.retrieveAllCountrys();
+  }
+
+  public changeOrder(propOrder): void {
+    this.propOrder = propOrder;
+    this.reverse = !this.reverse;
+    this.transition();
   }
 
   public closeDialog(): void {

@@ -19,6 +19,8 @@ import {
   waitUntilHidden,
 } from '../../util/utils';
 
+import path from 'path';
+
 const expect = chai.expect;
 
 describe('Employee e2e test', () => {
@@ -27,6 +29,8 @@ describe('Employee e2e test', () => {
   let detailsPage: EmployeeDetailsPage;
   let listPage: EmployeeComponentsPage;
   let deleteDialog: EmployeeDeleteDialog;
+  const fileToUpload = '../../../../../main/webapp/content/images/logo-jhipster.png';
+  const absolutePath = path.resolve(__dirname, fileToUpload);
   let beforeRecordsCount = 0;
   const username = process.env.E2E_USERNAME ?? 'admin';
   const password = process.env.E2E_PASSWORD ?? 'admin';
@@ -68,7 +72,7 @@ describe('Employee e2e test', () => {
 
       await updatePage.lastNameInput.sendKeys('lastName');
 
-      await updatePage.emailInput.sendKeys('email');
+      await updatePage.emailInput.sendKeys('l@8RG.e');
 
       await updatePage.phoneNumberInput.sendKeys('phoneNumber');
 
@@ -77,6 +81,13 @@ describe('Employee e2e test', () => {
       await updatePage.salaryInput.sendKeys('5');
 
       await updatePage.commissionPctInput.sendKeys('5');
+
+      await updatePage.levelInput.sendKeys('5');
+
+      await selectLastOption(updatePage.contractSelect);
+
+      await waitUntilDisplayed(updatePage.cvInput);
+      await updatePage.cvInput.sendKeys(absolutePath);
 
       // await selectLastOption(updatePage.managerSelect);
       // await selectLastOption(updatePage.departmentSelect);
@@ -93,7 +104,7 @@ describe('Employee e2e test', () => {
 
     describe('Details, Update, Delete flow', () => {
       after(async () => {
-        const deleteButton = listPage.getDeleteButton(listPage.records.last());
+        const deleteButton = listPage.getDeleteButton(listPage.records.first());
         await click(deleteButton);
 
         deleteDialog = new EmployeeDeleteDialog();
@@ -111,7 +122,7 @@ describe('Employee e2e test', () => {
       });
 
       it('should load details Employee page and fetch data', async () => {
-        const detailsButton = listPage.getDetailsButton(listPage.records.last());
+        const detailsButton = listPage.getDetailsButton(listPage.records.first());
         await click(detailsButton);
 
         detailsPage = new EmployeeDetailsPage();
@@ -126,7 +137,7 @@ describe('Employee e2e test', () => {
       });
 
       it('should load edit Employee page, fetch data and update', async () => {
-        const editButton = listPage.getEditButton(listPage.records.last());
+        const editButton = listPage.getEditButton(listPage.records.first());
         await click(editButton);
 
         await waitUntilAllDisplayed([updatePage.title, updatePage.footer, updatePage.saveButton]);
@@ -140,7 +151,7 @@ describe('Employee e2e test', () => {
         await updatePage.lastNameInput.sendKeys('modified');
 
         await updatePage.emailInput.clear();
-        await updatePage.emailInput.sendKeys('modified');
+        await updatePage.emailInput.sendKeys('(qoV@.&amp;.dp');
 
         await updatePage.phoneNumberInput.clear();
         await updatePage.phoneNumberInput.sendKeys('modified');
@@ -153,6 +164,9 @@ describe('Employee e2e test', () => {
 
         await clear(updatePage.commissionPctInput);
         await updatePage.commissionPctInput.sendKeys('6');
+
+        await clear(updatePage.levelInput);
+        await updatePage.levelInput.sendKeys('6');
 
         await updatePage.saveButton.click();
 

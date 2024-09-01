@@ -19,6 +19,8 @@ import {
   waitUntilHidden,
 } from '../../util/utils';
 
+import path from 'path';
+
 const expect = chai.expect;
 
 describe('JobHistory e2e test', () => {
@@ -27,6 +29,8 @@ describe('JobHistory e2e test', () => {
   let detailsPage: JobHistoryDetailsPage;
   let listPage: JobHistoryComponentsPage;
   let deleteDialog: JobHistoryDeleteDialog;
+  const fileToUpload = '../../../../../main/webapp/content/images/logo-jhipster.png';
+  const absolutePath = path.resolve(__dirname, fileToUpload);
   let beforeRecordsCount = 0;
   const username = process.env.E2E_USERNAME ?? 'admin';
   const password = process.env.E2E_PASSWORD ?? 'admin';
@@ -70,6 +74,13 @@ describe('JobHistory e2e test', () => {
 
       await selectLastOption(updatePage.languageSelect);
 
+      await waitUntilDisplayed(updatePage.fileInput);
+      await updatePage.fileInput.sendKeys(absolutePath);
+
+      await updatePage.dateInput.sendKeys('01/01/2001' + protractor.Key.TAB + '02:30AM');
+
+      await updatePage.durationInput.sendKeys('PT12S');
+
       // await selectLastOption(updatePage.jobSelect);
       // await selectLastOption(updatePage.departmentSelect);
       // await selectLastOption(updatePage.employeeSelect);
@@ -86,7 +97,7 @@ describe('JobHistory e2e test', () => {
 
     describe('Details, Update, Delete flow', () => {
       after(async () => {
-        const deleteButton = listPage.getDeleteButton(listPage.records.last());
+        const deleteButton = listPage.getDeleteButton(listPage.records.first());
         await click(deleteButton);
 
         deleteDialog = new JobHistoryDeleteDialog();
@@ -104,7 +115,7 @@ describe('JobHistory e2e test', () => {
       });
 
       it('should load details JobHistory page and fetch data', async () => {
-        const detailsButton = listPage.getDetailsButton(listPage.records.last());
+        const detailsButton = listPage.getDetailsButton(listPage.records.first());
         await click(detailsButton);
 
         detailsPage = new JobHistoryDetailsPage();
@@ -119,7 +130,7 @@ describe('JobHistory e2e test', () => {
       });
 
       it('should load edit JobHistory page, fetch data and update', async () => {
-        const editButton = listPage.getEditButton(listPage.records.last());
+        const editButton = listPage.getEditButton(listPage.records.first());
         await click(editButton);
 
         await waitUntilAllDisplayed([updatePage.title, updatePage.footer, updatePage.saveButton]);
@@ -131,6 +142,12 @@ describe('JobHistory e2e test', () => {
 
         await updatePage.endDateInput.clear();
         await updatePage.endDateInput.sendKeys('01/01/2019' + protractor.Key.TAB + '02:30AM');
+
+        await updatePage.dateInput.clear();
+        await updatePage.dateInput.sendKeys('01/01/2019' + protractor.Key.TAB + '02:30AM');
+
+        await clear(updatePage.durationInput);
+        await updatePage.durationInput.sendKeys('PT14S');
 
         await updatePage.saveButton.click();
 

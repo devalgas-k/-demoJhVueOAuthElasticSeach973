@@ -19,6 +19,8 @@ import {
   waitUntilHidden,
 } from '../../util/utils';
 
+import path from 'path';
+
 const expect = chai.expect;
 
 describe('Job e2e test', () => {
@@ -27,6 +29,8 @@ describe('Job e2e test', () => {
   let detailsPage: JobDetailsPage;
   let listPage: JobComponentsPage;
   let deleteDialog: JobDeleteDialog;
+  const fileToUpload = '../../../../../main/webapp/content/images/logo-jhipster.png';
+  const absolutePath = path.resolve(__dirname, fileToUpload);
   let beforeRecordsCount = 0;
   const username = process.env.E2E_USERNAME ?? 'admin';
   const password = process.env.E2E_PASSWORD ?? 'admin';
@@ -69,6 +73,17 @@ describe('Job e2e test', () => {
       await updatePage.minSalaryInput.sendKeys('5');
 
       await updatePage.maxSalaryInput.sendKeys('5');
+
+      await updatePage.subSalaryInput.sendKeys('5');
+
+      await updatePage.totalSalaryInput.sendKeys('5');
+
+      await updatePage.dateInput.sendKeys('2001-01-01');
+
+      await updatePage.codeCodeInput.sendKeys('64c99148-3908-465d-8c4a-e510e3ade974');
+
+      await waitUntilDisplayed(updatePage.profilInput);
+      await updatePage.profilInput.sendKeys(absolutePath);
 
       // await selectLastOption(updatePage.taskSelect);
       // await selectLastOption(updatePage.employeeSelect);
@@ -133,6 +148,18 @@ describe('Job e2e test', () => {
 
         await clear(updatePage.maxSalaryInput);
         await updatePage.maxSalaryInput.sendKeys('6');
+
+        await clear(updatePage.subSalaryInput);
+        await updatePage.subSalaryInput.sendKeys('6');
+
+        await clear(updatePage.totalSalaryInput);
+        await updatePage.totalSalaryInput.sendKeys('6');
+
+        await updatePage.dateInput.clear();
+        await updatePage.dateInput.sendKeys('2019-01-01');
+
+        await updatePage.codeCodeInput.clear();
+        await updatePage.codeCodeInput.sendKeys('64c99148-3908-465d-8c4a-e510e3ade978');
 
         await updatePage.saveButton.click();
 

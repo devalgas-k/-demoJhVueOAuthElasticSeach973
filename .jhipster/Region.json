@@ -1,19 +1,21 @@
 {
   "applications": "*",
   "changelogDate": "20240901000706",
-  "dto": "no",
+  "dto": "mapstruct",
   "embedded": false,
   "entityTableName": "region",
   "fields": [
     {
       "fieldName": "regionName",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["pattern"],
+      "fieldValidateRulesPattern": "^[A-Z][a-z]+\\d$"
     }
   ],
   "fluentMethods": true,
   "jpaMetamodelFiltering": false,
   "name": "Region",
-  "pagination": "no",
+  "pagination": "pagination",
   "readOnly": false,
   "relationships": [],
   "service": "serviceImpl"

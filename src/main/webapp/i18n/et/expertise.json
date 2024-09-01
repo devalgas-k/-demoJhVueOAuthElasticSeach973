@@ -1,0 +1,28 @@
+{
+  "demoJhVueOAuthElasticSearch973App": {
+    "expertise": {
+      "home": {
+        "title": "Expertise",
+        "refreshListLabel": "Värskenda nimekirja",
+        "createLabel": "Lisa uus Expertise",
+        "createOrEditLabel": "Lisa või muuda Expertise",
+        "search": "Otsi Expertise",
+        "notFound": "Ei leitud ühtegi Expertise"
+      },
+      "created": "Uus Expertise on loodud identifikaatoriga {{ param }}",
+      "updated": "Expertise identifikaatoriga {{ param }} on muudetud",
+      "deleted": "Expertise identifikaatoriga {{ param }} on kustutatud",
+      "delete": {
+        "question": "Kas olete kindel, et soovite kustutada Expertise {{ id }}?"
+      },
+      "detail": {
+        "title": "Expertise"
+      },
+      "id": "ID",
+      "title": "Title",
+      "description": "Description",
+      "level": "Level",
+      "experience": "Experience"
+    }
+  }
+}

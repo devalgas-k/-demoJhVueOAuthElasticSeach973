@@ -51,6 +51,30 @@ const JobHistory = () => import('@/entities/job-history/job-history.vue');
 const JobHistoryUpdate = () => import('@/entities/job-history/job-history-update.vue');
 // prettier-ignore
 const JobHistoryDetails = () => import('@/entities/job-history/job-history-details.vue');
+// prettier-ignore
+const Expertise = () => import('@/entities/expertise/expertise.vue');
+// prettier-ignore
+const ExpertiseUpdate = () => import('@/entities/expertise/expertise-update.vue');
+// prettier-ignore
+const ExpertiseDetails = () => import('@/entities/expertise/expertise-details.vue');
+// prettier-ignore
+const Experience = () => import('@/entities/experience/experience.vue');
+// prettier-ignore
+const ExperienceUpdate = () => import('@/entities/experience/experience-update.vue');
+// prettier-ignore
+const ExperienceDetails = () => import('@/entities/experience/experience-details.vue');
+// prettier-ignore
+const Message = () => import('@/entities/message/message.vue');
+// prettier-ignore
+const MessageUpdate = () => import('@/entities/message/message-update.vue');
+// prettier-ignore
+const MessageDetails = () => import('@/entities/message/message-details.vue');
+// prettier-ignore
+const Subject = () => import('@/entities/subject/subject.vue');
+// prettier-ignore
+const SubjectUpdate = () => import('@/entities/subject/subject-update.vue');
+// prettier-ignore
+const SubjectDetails = () => import('@/entities/subject/subject-details.vue');
 // jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
 
 export default {
@@ -247,6 +271,102 @@ export default {
       path: 'job-history/:jobHistoryId/view',
       name: 'JobHistoryView',
       component: JobHistoryDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'expertise',
+      name: 'Expertise',
+      component: Expertise,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'expertise/new',
+      name: 'ExpertiseCreate',
+      component: ExpertiseUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'expertise/:expertiseId/edit',
+      name: 'ExpertiseEdit',
+      component: ExpertiseUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'expertise/:expertiseId/view',
+      name: 'ExpertiseView',
+      component: ExpertiseDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'experience',
+      name: 'Experience',
+      component: Experience,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'experience/new',
+      name: 'ExperienceCreate',
+      component: ExperienceUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'experience/:experienceId/edit',
+      name: 'ExperienceEdit',
+      component: ExperienceUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'experience/:experienceId/view',
+      name: 'ExperienceView',
+      component: ExperienceDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'message',
+      name: 'Message',
+      component: Message,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'message/new',
+      name: 'MessageCreate',
+      component: MessageUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'message/:messageId/edit',
+      name: 'MessageEdit',
+      component: MessageUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'message/:messageId/view',
+      name: 'MessageView',
+      component: MessageDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subject',
+      name: 'Subject',
+      component: Subject,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subject/new',
+      name: 'SubjectCreate',
+      component: SubjectUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subject/:subjectId/edit',
+      name: 'SubjectEdit',
+      component: SubjectUpdate,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'subject/:subjectId/view',
+      name: 'SubjectView',
+      component: SubjectDetails,
       meta: { authorities: [Authority.USER] },
     },
     // jhipster-needle-add-entity-to-router - JHipster will add entities to the router here

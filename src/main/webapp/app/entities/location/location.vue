@@ -50,12 +50,30 @@
       <table class="table table-striped" aria-describedby="locations">
         <thead>
           <tr>
-            <th scope="row"><span v-text="$t('global.field.id')">ID</span></th>
-            <th scope="row"><span v-text="$t('demoJhVueOAuthElasticSearch973App.location.streetAddress')">Street Address</span></th>
-            <th scope="row"><span v-text="$t('demoJhVueOAuthElasticSearch973App.location.postalCode')">Postal Code</span></th>
-            <th scope="row"><span v-text="$t('demoJhVueOAuthElasticSearch973App.location.city')">City</span></th>
-            <th scope="row"><span v-text="$t('demoJhVueOAuthElasticSearch973App.location.stateProvince')">State Province</span></th>
-            <th scope="row"><span v-text="$t('demoJhVueOAuthElasticSearch973App.location.country')">Country</span></th>
+            <th scope="row" v-on:click="changeOrder('id')">
+              <span v-text="$t('global.field.id')">ID</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'id'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('streetAddress')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.location.streetAddress')">Street Address</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'streetAddress'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('postalCode')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.location.postalCode')">Postal Code</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'postalCode'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('city')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.location.city')">City</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'city'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('stateProvince')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.location.stateProvince')">State Province</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'stateProvince'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('country.id')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.location.country')">Country</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'country.id'"></jhi-sort-indicator>
+            </th>
             <th scope="row"></th>
           </tr>
         </thead>
@@ -133,6 +151,14 @@
         </button>
       </div>
     </b-modal>
+    <div v-show="locations && locations.length > 0">
+      <div class="row justify-content-center">
+        <jhi-item-count :page="page" :total="queryCount" :itemsPerPage="itemsPerPage"></jhi-item-count>
+      </div>
+      <div class="row justify-content-center">
+        <b-pagination size="md" :total-rows="totalItems" v-model="page" :per-page="itemsPerPage" :change="loadPage(page)"></b-pagination>
+      </div>
+    </div>
   </div>
 </template>
 

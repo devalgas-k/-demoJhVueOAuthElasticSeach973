@@ -1,6 +1,9 @@
+import { mixins } from 'vue-class-component';
 import { Component, Vue, Inject } from 'vue-property-decorator';
 import Vue2Filters from 'vue2-filters';
 import { IJob } from '@/shared/model/job.model';
+
+import JhiDataUtils from '@/shared/data/data-utils.service';
 
 import JobService from './job.service';
 import AlertService from '@/shared/alert/alert.service';
@@ -8,7 +11,7 @@ import AlertService from '@/shared/alert/alert.service';
 @Component({
   mixins: [Vue2Filters.mixin],
 })
-export default class Job extends Vue {
+export default class Job extends mixins(JhiDataUtils) {
   @Inject('jobService') private jobService: () => JobService;
   @Inject('alertService') private alertService: () => AlertService;
 

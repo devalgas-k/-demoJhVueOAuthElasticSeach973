@@ -1,5 +1,9 @@
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Component, Inject } from 'vue-property-decorator';
 
+import { mixins } from 'vue-class-component';
+import JhiDataUtils from '@/shared/data/data-utils.service';
+
+import { required, numeric, minValue, maxValue } from 'vuelidate/lib/validators';
 import dayjs from 'dayjs';
 import { DATE_TIME_LONG_FORMAT } from '@/shared/date/filters';
 
@@ -13,23 +17,33 @@ import { IDepartment } from '@/shared/model/department.model';
 
 import { IEmployee, Employee } from '@/shared/model/employee.model';
 import EmployeeService from './employee.service';
+import { Contract } from '@/shared/model/enumerations/contract.model';
 
 const validations: any = {
   employee: {
     firstName: {},
     lastName: {},
-    email: {},
+    email: {
+      required,
+    },
     phoneNumber: {},
     hireDate: {},
     salary: {},
     commissionPct: {},
+    level: {
+      numeric,
+      min: minValue(1),
+      max: maxValue(14),
+    },
+    contract: {},
+    cv: {},
   },
 };
 
 @Component({
   validations,
 })
-export default class EmployeeUpdate extends Vue {
+export default class EmployeeUpdate extends mixins(JhiDataUtils) {
   @Inject('employeeService') private employeeService: () => EmployeeService;
   @Inject('alertService') private alertService: () => AlertService;
 
@@ -44,6 +58,7 @@ export default class EmployeeUpdate extends Vue {
   @Inject('departmentService') private departmentService: () => DepartmentService;
 
   public departments: IDepartment[] = [];
+  public contractValues: string[] = Object.keys(Contract);
   public isSaving = false;
   public currentLanguage = '';
 

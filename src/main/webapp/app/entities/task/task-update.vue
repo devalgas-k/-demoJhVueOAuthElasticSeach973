@@ -24,21 +24,36 @@
               data-cy="title"
               :class="{ valid: !$v.task.title.$invalid, invalid: $v.task.title.$invalid }"
               v-model="$v.task.title.$model"
+              required
             />
+            <div v-if="$v.task.title.$anyDirty && $v.task.title.$invalid">
+              <small class="form-text text-danger" v-if="!$v.task.title.required" v-text="$t('entity.validation.required')">
+                This field is required.
+              </small>
+              <small class="form-text text-danger" v-if="!$v.task.title.maxLength" v-text="$t('entity.validation.maxlength', { max: 256 })">
+                This field cannot be longer than 256 characters.
+              </small>
+              <small
+                class="form-text text-danger"
+                v-if="!$v.task.title.pattern"
+                v-text="$t('entity.validation.pattern', { pattern: 'Title' })"
+              >
+                This field should follow pattern for "Title".
+              </small>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-control-label" v-text="$t('demoJhVueOAuthElasticSearch973App.task.description')" for="task-description"
               >Description</label
             >
-            <input
-              type="text"
+            <textarea
               class="form-control"
               name="description"
               id="task-description"
               data-cy="description"
               :class="{ valid: !$v.task.description.$invalid, invalid: $v.task.description.$invalid }"
               v-model="$v.task.description.$model"
-            />
+            ></textarea>
           </div>
         </div>
         <div>

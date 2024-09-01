@@ -86,7 +86,7 @@ describe('Location e2e test', () => {
 
     describe('Details, Update, Delete flow', () => {
       after(async () => {
-        const deleteButton = listPage.getDeleteButton(listPage.records.last());
+        const deleteButton = listPage.getDeleteButton(listPage.records.first());
         await click(deleteButton);
 
         deleteDialog = new LocationDeleteDialog();
@@ -104,7 +104,7 @@ describe('Location e2e test', () => {
       });
 
       it('should load details Location page and fetch data', async () => {
-        const detailsButton = listPage.getDetailsButton(listPage.records.last());
+        const detailsButton = listPage.getDetailsButton(listPage.records.first());
         await click(detailsButton);
 
         detailsPage = new LocationDetailsPage();
@@ -119,7 +119,7 @@ describe('Location e2e test', () => {
       });
 
       it('should load edit Location page, fetch data and update', async () => {
-        const editButton = listPage.getEditButton(listPage.records.last());
+        const editButton = listPage.getEditButton(listPage.records.first());
         await click(editButton);
 
         await waitUntilAllDisplayed([updatePage.title, updatePage.footer, updatePage.saveButton]);

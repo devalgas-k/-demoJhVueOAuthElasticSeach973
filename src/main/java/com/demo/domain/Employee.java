@@ -1,19 +1,19 @@
 package com.demo.domain;
 
+import com.demo.domain.enumeration.Contract;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * The Employee entity.
  */
-@Schema(description = "The Employee entity.")
 @Entity
 @Table(name = "employee")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -32,14 +32,15 @@ public class Employee implements Serializable {
     /**
      * The firstname attribute.
      */
-    @Schema(description = "The firstname attribute.")
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @NotNull
+    @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "phone_number")
@@ -54,6 +55,22 @@ public class Employee implements Serializable {
     @Column(name = "commission_pct")
     private Long commissionPct;
 
+    @Min(value = 1)
+    @Max(value = 14)
+    @Column(name = "level")
+    private Integer level;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "contract")
+    private Contract contract;
+
+    @Lob
+    @Column(name = "cv")
+    private byte[] cv;
+
+    @Column(name = "cv_content_type")
+    private String cvContentType;
+
     @OneToMany(mappedBy = "employee")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @org.springframework.data.annotation.Transient
@@ -67,7 +84,6 @@ public class Employee implements Serializable {
     /**
      * Another side of the same relationship
      */
-    @Schema(description = "Another side of the same relationship")
     @ManyToOne
     @JsonIgnoreProperties(value = { "location", "employees" }, allowSetters = true)
     private Department department;
@@ -178,6 +194,58 @@ public class Employee implements Serializable {
         this.commissionPct = commissionPct;
     }
 
+    public Integer getLevel() {
+        return this.level;
+    }
+
+    public Employee level(Integer level) {
+        this.setLevel(level);
+        return this;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    public Contract getContract() {
+        return this.contract;
+    }
+
+    public Employee contract(Contract contract) {
+        this.setContract(contract);
+        return this;
+    }
+
+    public void setContract(Contract contract) {
+        this.contract = contract;
+    }
+
+    public byte[] getCv() {
+        return this.cv;
+    }
+
+    public Employee cv(byte[] cv) {
+        this.setCv(cv);
+        return this;
+    }
+
+    public void setCv(byte[] cv) {
+        this.cv = cv;
+    }
+
+    public String getCvContentType() {
+        return this.cvContentType;
+    }
+
+    public Employee cvContentType(String cvContentType) {
+        this.cvContentType = cvContentType;
+        return this;
+    }
+
+    public void setCvContentType(String cvContentType) {
+        this.cvContentType = cvContentType;
+    }
+
     public Set<Job> getJobs() {
         return this.jobs;
     }
@@ -266,6 +334,10 @@ public class Employee implements Serializable {
             ", hireDate='" + getHireDate() + "'" +
             ", salary=" + getSalary() +
             ", commissionPct=" + getCommissionPct() +
+            ", level=" + getLevel() +
+            ", contract='" + getContract() + "'" +
+            ", cv='" + getCv() + "'" +
+            ", cvContentType='" + getCvContentType() + "'" +
             "}";
     }
 }

@@ -61,6 +61,26 @@
               <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.maxSalary')">Max Salary</span>
               <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'maxSalary'"></jhi-sort-indicator>
             </th>
+            <th scope="row" v-on:click="changeOrder('subSalary')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.subSalary')">Sub Salary</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'subSalary'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('totalSalary')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.totalSalary')">Total Salary</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'totalSalary'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('date')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.date')">Date</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'date'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('codeCode')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.codeCode')">Code Code</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'codeCode'"></jhi-sort-indicator>
+            </th>
+            <th scope="row" v-on:click="changeOrder('profil')">
+              <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.profil')">Profil</span>
+              <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'profil'"></jhi-sort-indicator>
+            </th>
             <th scope="row" v-on:click="changeOrder('employee.id')">
               <span v-text="$t('demoJhVueOAuthElasticSearch973App.job.employee')">Employee</span>
               <jhi-sort-indicator :current-order="propOrder" :reverse="reverse" :field-name="'employee.id'"></jhi-sort-indicator>
@@ -76,6 +96,16 @@
             <td>{{ job.jobTitle }}</td>
             <td>{{ job.minSalary }}</td>
             <td>{{ job.maxSalary }}</td>
+            <td>{{ job.subSalary }}</td>
+            <td>{{ job.totalSalary }}</td>
+            <td>{{ job.date }}</td>
+            <td>{{ job.codeCode }}</td>
+            <td>
+              <a v-if="job.profil" v-on:click="openFile(job.profilContentType, job.profil)">
+                <img v-bind:src="'data:' + job.profilContentType + ';base64,' + job.profil" style="max-height: 30px" alt="job image" />
+              </a>
+              <span v-if="job.profil">{{ job.profilContentType }}, {{ byteSize(job.profil) }}</span>
+            </td>
             <td>
               <div v-if="job.employee">
                 <router-link :to="{ name: 'EmployeeView', params: { employeeId: job.employee.id } }">{{ job.employee.id }}</router-link>

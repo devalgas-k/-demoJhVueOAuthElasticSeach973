@@ -34,7 +34,7 @@ describe('Service Tests', () => {
     beforeEach(() => {
       service = new JobHistoryService();
       currentDate = new Date();
-      elemDefault = new JobHistory(123, currentDate, currentDate, Language.FRENCH);
+      elemDefault = new JobHistory(123, currentDate, currentDate, Language.FRENCH, 'image/png', 'AAAAAAA', currentDate, 'PT1S');
     });
 
     describe('Service methods', () => {
@@ -43,6 +43,7 @@ describe('Service Tests', () => {
           {
             startDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             endDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
+            date: dayjs(currentDate).format(DATE_TIME_FORMAT),
           },
           elemDefault
         );
@@ -69,6 +70,7 @@ describe('Service Tests', () => {
             id: 123,
             startDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             endDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
+            date: dayjs(currentDate).format(DATE_TIME_FORMAT),
           },
           elemDefault
         );
@@ -76,6 +78,7 @@ describe('Service Tests', () => {
           {
             startDate: currentDate,
             endDate: currentDate,
+            date: currentDate,
           },
           returnedFromService
         );
@@ -103,6 +106,9 @@ describe('Service Tests', () => {
             startDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             endDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             language: 'BBBBBB',
+            file: 'BBBBBB',
+            date: dayjs(currentDate).format(DATE_TIME_FORMAT),
+            duration: 'PT2S',
           },
           elemDefault
         );
@@ -111,6 +117,7 @@ describe('Service Tests', () => {
           {
             startDate: currentDate,
             endDate: currentDate,
+            date: currentDate,
           },
           returnedFromService
         );
@@ -136,6 +143,7 @@ describe('Service Tests', () => {
         const patchObject = Object.assign(
           {
             endDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
+            file: 'BBBBBB',
           },
           new JobHistory()
         );
@@ -145,6 +153,7 @@ describe('Service Tests', () => {
           {
             startDate: currentDate,
             endDate: currentDate,
+            date: currentDate,
           },
           returnedFromService
         );
@@ -172,6 +181,9 @@ describe('Service Tests', () => {
             startDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             endDate: dayjs(currentDate).format(DATE_TIME_FORMAT),
             language: 'BBBBBB',
+            file: 'BBBBBB',
+            date: dayjs(currentDate).format(DATE_TIME_FORMAT),
+            duration: 'PT2S',
           },
           elemDefault
         );
@@ -179,6 +191,7 @@ describe('Service Tests', () => {
           {
             startDate: currentDate,
             endDate: currentDate,
+            date: currentDate,
           },
           returnedFromService
         );

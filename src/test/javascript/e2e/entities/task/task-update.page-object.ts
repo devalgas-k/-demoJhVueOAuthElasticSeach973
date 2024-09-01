@@ -10,5 +10,5 @@ export default class TaskUpdatePage extends AlertPage {
 
   titleInput: ElementFinder = element(by.css('input#task-title'));
 
-  descriptionInput: ElementFinder = element(by.css('input#task-description'));
+  descriptionInput: ElementFinder = element(by.css('textarea#task-description'));
 }

@@ -12,12 +12,13 @@ import com.demo.IntegrationTest;
 import com.demo.domain.Location;
 import com.demo.repository.LocationRepository;
 import com.demo.repository.search.LocationSearchRepository;
+import com.demo.service.dto.LocationDTO;
+import com.demo.service.mapper.LocationMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import org.apache.commons.collections4.IterableUtils;
 import org.assertj.core.util.IterableUtil;
@@ -26,6 +27,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -60,6 +64,9 @@ class LocationResourceIT {
 
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private LocationMapper locationMapper;
 
     @Autowired
     private LocationSearchRepository locationSearchRepository;
@@ -119,12 +126,13 @@ class LocationResourceIT {
         int databaseSizeBeforeCreate = locationRepository.findAll().size();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
         // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
         restLocationMockMvc
             .perform(
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isCreated());
 
@@ -149,6 +157,7 @@ class LocationResourceIT {
     void createLocationWithExistingId() throws Exception {
         // Create the Location with an existing ID
         location.setId(1L);
+        LocationDTO locationDTO = locationMapper.toDto(location);
 
         int databaseSizeBeforeCreate = locationRepository.findAll().size();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
@@ -159,7 +168,7 @@ class LocationResourceIT {
                 post(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -232,13 +241,14 @@ class LocationResourceIT {
             .postalCode(UPDATED_POSTAL_CODE)
             .city(UPDATED_CITY)
             .stateProvince(UPDATED_STATE_PROVINCE);
+        LocationDTO locationDTO = locationMapper.toDto(updatedLocation);
 
         restLocationMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, updatedLocation.getId())
+                put(ENTITY_API_URL_ID, locationDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(updatedLocation))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isOk());
 
@@ -271,13 +281,16 @@ class LocationResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
         location.setId(count.incrementAndGet());
 
+        // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLocationMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, location.getId())
+                put(ENTITY_API_URL_ID, locationDTO.getId())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -295,13 +308,16 @@ class LocationResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
         location.setId(count.incrementAndGet());
 
+        // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restLocationMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -319,13 +335,16 @@ class LocationResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
         location.setId(count.incrementAndGet());
 
+        // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restLocationMockMvc
             .perform(
                 put(ENTITY_API_URL)
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 
@@ -413,13 +432,16 @@ class LocationResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
         location.setId(count.incrementAndGet());
 
+        // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
+
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restLocationMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, location.getId())
+                patch(ENTITY_API_URL_ID, locationDTO.getId())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -437,13 +459,16 @@ class LocationResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
         location.setId(count.incrementAndGet());
 
+        // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restLocationMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, count.incrementAndGet())
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -461,13 +486,16 @@ class LocationResourceIT {
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(locationSearchRepository.findAll());
         location.setId(count.incrementAndGet());
 
+        // Create the Location
+        LocationDTO locationDTO = locationMapper.toDto(location);
+
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restLocationMockMvc
             .perform(
                 patch(ENTITY_API_URL)
                     .with(csrf())
                     .contentType("application/merge-patch+json")
-                    .content(TestUtil.convertObjectToJsonBytes(location))
+                    .content(TestUtil.convertObjectToJsonBytes(locationDTO))
             )
             .andExpect(status().isMethodNotAllowed());
 

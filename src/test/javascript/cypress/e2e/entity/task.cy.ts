@@ -15,7 +15,7 @@ describe('Task e2e test', () => {
   const taskPageUrlPattern = new RegExp('/task(\\?.*)?$');
   const username = Cypress.env('E2E_USERNAME') ?? 'user';
   const password = Cypress.env('E2E_PASSWORD') ?? 'user';
-  const taskSample = {};
+  const taskSample = { title: 'O_Tbw' };
 
   let task;
 
@@ -91,6 +91,9 @@ describe('Task e2e test', () => {
             },
             {
               statusCode: 200,
+              headers: {
+                link: '<http://localhost/api/tasks?page=0&size=20>; rel="last",<http://localhost/api/tasks?page=0&size=20>; rel="first"',
+              },
               body: [task],
             }
           ).as('entitiesRequestInternal');
@@ -157,9 +160,12 @@ describe('Task e2e test', () => {
     });
 
     it('should create an instance of Task', () => {
-      cy.get(`[data-cy="title"]`).type('Albanie').should('have.value', 'Albanie');
+      cy.get(`[data-cy="title"]`).type('H %C').should('have.value', 'H %C');
 
-      cy.get(`[data-cy="description"]`).type('la Philippines').should('have.value', 'la Philippines');
+      cy.get(`[data-cy="description"]`)
+        .type('../fake-data/blob/hipster.txt')
+        .invoke('val')
+        .should('match', new RegExp('../fake-data/blob/hipster.txt'));
 
       cy.get(entityCreateSaveButtonSelector).click();
 
